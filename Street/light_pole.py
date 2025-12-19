@@ -27,7 +27,9 @@ class LightPole:
         gluCylinder(quad, s / 8, s/8, 3, 16, 1)
         glPopMatrix()
 
-        # Brazo
-
-        # LED
-
+        # Luz
+        glPushMatrix()
+        glColor3f(1, 1, 0)
+        glTranslatef(0, s*3, 0)
+        gluSphere(quad, s/4, 16, 16)
+        glPopMatrix()
