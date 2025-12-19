@@ -17,13 +17,20 @@ WINDOW_TITLE = "El Balatreador"
 # Variables de figuras
 tex_floor = None
 
+tex_craft_top = None
+tex_craft_bottom = None
+tex_craft_side = None
+tex_craft_front = None
+
 
 # Variables de Mediapipe
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
 hands = mp_hands.Hands(min_detection_confidence=0.5, min_tracking_confidence=0.5)
 
-
+# ============================================================
+# GLF
+# ============================================================
 def init_glfw():
     if not glfw.init():
         raise RuntimeError("Failed to initialize GLFW")
@@ -40,6 +47,9 @@ def init_glfw():
 
 
 def setup_opengl():
+    global tex_floor
+    global tex_craft_top, tex_craft_bottom, tex_craft_side, tex_craft_front
+
     glClearColor(0.165, 0.753, 0.98, 1.0)
     glEnable(GL_DEPTH_TEST)
     glEnable(GL_TEXTURE_2D)
@@ -55,10 +65,15 @@ def setup_opengl():
     glMatrixMode(GL_MODELVIEW)
 
     tex_floor = load_texture("C:/Users/User/Desktop/CiudadPeluche/res/floor4k.jpg")
+    tex_craft_top = load_texture("C:/Users/User/Desktop/CiudadPeluche/res/crafting_top.png")
+    tex_craft_bottom = load_texture("C:/Users/User/Desktop/CiudadPeluche/res/oak_planks.png")
+    tex_craft_side = load_texture("C:/Users/User/Desktop/CiudadPeluche/res/crafting_side.png")
+    tex_craft_front = load_texture("C:/Users/User/Desktop/CiudadPeluche/res/crafting_front.png")
 
 
 def load_texture(path):
     img = Image.open(path).convert("RGB")
+    img = img.transpose(Image.ROTATE_180)
     img_data = img.tobytes()
 
     tex_id = glGenTextures(1)
@@ -104,15 +119,185 @@ def setup_lights():
     glLightfv(GL_LIGHT1, GL_POSITION, (1, 1, 1, 0))
     glLightfv(GL_LIGHT1, GL_DIFFUSE, (0.5, 0.5, 0.5, 1))
 
+# ============================================================
+# Dibujo de primitivas
+# ============================================================
 
+# Horizontal
+# a1 = (x1, y1, z1)
+# a2 = (x2, y2, z2)
+#
+# p1 = (x1, y1, z1)
+# p2 = (x2, y1, z1)
+# p3 = (x1, y2, z2)
+# p4 = (x2, y2, z2)
+
+
+def draw_textured_rectangle_top(p1,p2, texture=None):
+    glBindTexture(GL_TEXTURE_2D, texture)
+
+
+    glBegin(GL_QUADS)
+    glColor3f(1, 1, 1)
+
+    glNormal3f(0.0, 0.0, -1.0)
+
+    point1 = (p1[0], p1[1], p1[2])
+    point2 = (p2[0], p1[1], p1[2])
+    point3 = (p2[0], p2[1], p2[2])
+    point4 = (p1[0], p2[1], p2[2])
+
+
+    glTexCoord2f(0, 0); glVertex3f(*point1)
+    glTexCoord2f(1, 0); glVertex3f(*point2)
+    glTexCoord2f(1, 1); glVertex3f(*point3)
+    glTexCoord2f(0, 1); glVertex3f(*point4)
+
+    glEnd()
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+
+# Vertical
+# a1 = (x1, y1, z1)
+# a2 = (x2, y2, z2)
+#
+# p1 = (x1, y1, z1)
+# p2 = (x1, y2, z1)
+# p3 = (x2, y1, z2)
+# p4 = (x2, y2, z2)
+
+def draw_textured_rectangle_side(p1, p2, texture=None):
+    glBindTexture(GL_TEXTURE_2D, texture)
+
+    glBegin(GL_QUADS)
+    glColor3f(1, 1, 1)
+
+    glNormal3f(0.0, 0.0, -1.0)
+
+    point1 = (p1[0], p1[1], p1[2])
+    point2 = (p1[0], p2[1], p1[2])
+    point3 = (p2[0], p2[1], p2[2])
+    point4 = (p2[0], p1[1], p2[2])
+
+
+    glTexCoord2f(0, 0); glVertex3f(*point1)
+    glTexCoord2f(1, 0); glVertex3f(*point2)
+    glTexCoord2f(1, 1); glVertex3f(*point3)
+    glTexCoord2f(0, 1); glVertex3f(*point4)
+
+    glEnd()
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+
+
+# ============================================================
+# Modelos
+# ============================================================
+def draw_floor():
+    glBindTexture(GL_TEXTURE_2D, tex_floor)
+    glBegin(GL_QUADS)
+    glTexCoord2f(0, 0); glVertex3f(-5, -0.1, -5)
+    glTexCoord2f(1, 0); glVertex3f(5, -0.1, -5)
+    glTexCoord2f(1, 1); glVertex3f(5, -0.1, 5)
+    glTexCoord2f(0, 1); glVertex3f(-5, -0.1, 5)
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+def draw_textured_cube(texture_top=None, texture_bottom=None, texture_side=None, texture_front=None):
+    glBindTexture(GL_TEXTURE_2D, texture_front)
+
+    glBegin(GL_QUADS)
+
+    # Frente (z = +1)
+    glColor3f(1, 1, 1)
+    glTexCoord2f(0, 0); glVertex3f(-1, -1, 1)
+    glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
+    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+    glTexCoord2f(0, 1); glVertex3f(-1, 1, 1)
+    glEnd()
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+
+    glBindTexture(GL_TEXTURE_2D, texture_front)
+    glBegin(GL_QUADS)
+    # Atrás (z = -1)
+    glColor3f(1, 1, 1)
+
+    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+    glTexCoord2f(1, 0); glVertex3f(-1, 1, -1)
+    glTexCoord2f(1, 1); glVertex3f(1, 1, -1)
+    glTexCoord2f(0, 1); glVertex3f(1, -1, -1)
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glBindTexture(GL_TEXTURE_2D, texture_side)
+    glBegin(GL_QUADS)
+    # Izquierda (x = -1)
+    glColor3f(1, 1, 1)
+    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+    glTexCoord2f(1, 0); glVertex3f(-1, -1, 1)
+    glTexCoord2f(1, 1); glVertex3f(-1, 1, 1)
+    glTexCoord2f(0, 1); glVertex3f(-1, 1, -1)
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glBindTexture(GL_TEXTURE_2D, texture_side)
+    glBegin(GL_QUADS)
+    # Derecha (x = +1)
+    glColor3f(1, 1, 1)
+    glTexCoord2f(0, 0); glVertex3f(1, -1, -1)
+    glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
+    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+    glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
+    glEnd()
+
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glBindTexture(GL_TEXTURE_2D, texture_top)
+    glBegin(GL_QUADS)
+    # Arriba (y = +1)
+    glColor3f(1, 1, 1)
+    glTexCoord2f(0, 0); glVertex3f(-1, 1, -1)
+    glTexCoord2f(1, 0); glVertex3f(-1, 1, 1)
+    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+    glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+    glBindTexture(GL_TEXTURE_2D, texture_bottom)
+    glBegin(GL_QUADS)
+    # Abajo (y = -1)
+    glColor3f(1, 1, 1)
+    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+    glTexCoord2f(1, 0); glVertex3f(1, -1, -1)
+    glTexCoord2f(1, 1); glVertex3f(1, -1, 1)
+    glTexCoord2f(0, 1); glVertex3f(-1, -1, 1)
+
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, 0)
+
+
+# ============================================================
+# Mundo
+# ============================================================
 def draw_scene():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
-    gluLookAt(4, 4, 8,
+    gluLookAt(5, 2, 5,
               0, 0, 0,
               0, 1, 0)
 
+    draw_floor()
+    glDisable(GL_LIGHTING)
+    scale = 0.25
+    glTranslatef(0, 1*scale, 0)
+    glScalef(scale, scale, scale)
+    draw_textured_cube(tex_craft_top, tex_craft_bottom, tex_craft_side, tex_craft_front)
+    glEnable(GL_LIGHTING)
 
     glfw.swap_buffers(window)
 
