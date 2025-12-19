@@ -1,7 +1,7 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-
+from Alive.Minion import Minion
 from Alive.Fish import Fish
 from Alive.Ferrari import Ferrari
 from Street.Tree import Tree
@@ -15,6 +15,7 @@ ferr = Ferrari()
 a1 = Tree()
 b1 = Building()
 ox = Oxxo()
+O = Minion()
 
 w, h = 800, 600
 
@@ -47,14 +48,14 @@ def display():
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glTranslatef(-2, -1, 0)
-    ox.draw()
+    O.draw()
     #glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     glutSwapBuffers()
 
     glutKeyboardFunc(keyboard)
 
-    angle += 0.01
+    angle += 0.0
 
 def idle():
     glutPostRedisplay()
