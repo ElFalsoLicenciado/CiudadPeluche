@@ -12,7 +12,7 @@ from Street.building import Building
 from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
-from Util.Landmarks import HAND_CONNECTIONS
+from Util.Landmarks import HAND_CONNECTIONS 
 
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
