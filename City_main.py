@@ -35,8 +35,10 @@ normal_fish = Fish(0.1)
 normal_ferrari = Ferrari(0.6)
 normal_tree = Tree(1.2)
 big_tree = Tree(2)
-normal_light_pole = LightPole(1)
+normal_light_pole = LightPole(0.75)
+
 normal_oxxo = Oxxo(1)
+mini_oxxo = Oxxo(0.7)
 
 def init():
     glClearColor(0, 0, 0.6, 1.0)
@@ -155,22 +157,22 @@ def movement(pts, frame_x):
 
     # Zoom hacia dentro si todos los dedos están juntos
     if dist_prom < 30.0:
-        zoom += 0.001
+        zoom += 0.005
     # Zoom hacia afuera si todos los dedos están separados y lejos de la muñeca
     if dist_prom > 90 and dist_wrist_middle > 70.0 and dist_wrist_pinky > 70.0 and dist_ring_pinky > 70:
-        zoom -= 0.001
+        zoom -= 0.005
     # Habilita movimiento de la escena si el dedo índice y medio están juntos, y el verificador de movimiento es verdadero
     if dist_index_middle < 30.0 and move_verify:
         # Diferencia entre la mitad de la pantalla y la posición del dedo medio para velocidad de rotación
         move_dist = screen_mid - pts[12][0]
-        angle += move_dist * 0.0001
+        angle += move_dist * 0.001
         print("Distancia: ", move_dist)
     # Disminuye la altura de la cámara al solo levantar el meñique
     if only_pinky and dist(pts[20],pts[15]) > 40 and dist_prom < 60:
-        height -= 0.001
+        height -= 0.005
     # Aumenta la altura de la cámara al solo levantar el índice
     if only_index and dist(pts[7],pts[11]) > 30 and 55 < dist_prom < 80:
-        height += 0.001
+        height += 0.005
 
 def dist(p1, p2):
     return math.sqrt(
@@ -201,7 +203,7 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 40, 2, # (0, 100, 1) Para vista aérea
+    gluLookAt(0, height, zoom, # (0, 100, 1) Para vista aérea
               0, 4, 0,
               0, 1, 0
     )
@@ -221,6 +223,23 @@ def display():
     normal_light_pole.draw()
     glPopMatrix()
 
+    glPushMatrix()
+    glTranslatef(-8.25, 0, 10)
+    normal_light_pole.draw()
+    glPopMatrix()
+
+    # ESTANQUE ##########
+
+    quadric = gluNewQuadric()
+    gluQuadricNormals(quadric, GLU_SMOOTH)
+
+    glPushMatrix()
+    glColor3f(0.2,0,1)
+    glRotatef(90,-1,0,0)
+    glTranslatef(4.5,-9,0.01)
+    gluDisk(quadric, 0, 1.55, 16, 8)
+    glPopMatrix()
+
     # BUILDING ################
 
     glPushMatrix()
@@ -235,15 +254,33 @@ def display():
     mini_building.draw()
     glPopMatrix()
 
+    glPushMatrix()
+    glTranslatef(8.2, 0, 9.3)
+    # glRotatef(45,0,0,0)
+    normal_building.draw()
+    glPopMatrix()
+
     # CONGLOMERADO ##
     glPushMatrix()
-    glTranslatef(8.75,0,-3.7)
+    glTranslatef(8.75,0,-3.6)
     mini_building.draw()
     glTranslatef(0,0,2.5)
     mini_building.draw()
     glTranslatef(0, 0, 2)
     mini_building.draw()
     glTranslatef(0, 0, 2.5)
+    mini_building.draw()
+    glPopMatrix()
+
+    # CONGLOMERADO 2 ##
+    glPushMatrix()
+    glTranslatef(-8.75, 0, -2.5)
+    mini_building.draw()
+    glTranslatef(0, 0, 1.5)
+    mini_building.draw()
+    glTranslatef(0, 0, 2)
+    mini_building.draw()
+    glTranslatef(0, 0, 1.5)
     mini_building.draw()
     glPopMatrix()
 
@@ -298,23 +335,46 @@ def display():
     # ARBOL ######################
 
     glPushMatrix()
-    glTranslatef(10, 0, 0)
+    glTranslatef(10, -1, 0)
     # glRotatef(45,0,0,0)
     normal_tree.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(2.5, 0, -3.2)
+    glTranslatef(2.5, -1, -3.2)
     # glRotatef(45,0,0,0)
     big_tree.draw()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-9.4, -1, -8.2)
+    normal_tree.draw()
+    glTranslatef(0, 0, -1.5)
+    normal_tree.draw()
+    glTranslatef(1.5, 0, 0)
+    normal_tree.draw()
+    glTranslatef(0, 0, 1.5)
+    normal_tree.draw()
     glPopMatrix()
 
     # OXXO ########################
 
     glPushMatrix()
-    glTranslatef(5.5, 0, -8.7)
-    # glRotatef(45,0,0,0)
+    glTranslatef(5.5, 1, -8.7)
     normal_oxxo.draw()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-10, 0.5, 8.65)
+    mini_oxxo.draw()
+    glPopMatrix()
+
+    glPushMatrix()
+    glRotatef(90, 0, -1, 0)
+    glTranslatef(-3.5, 0.5, 2.75)
+    mini_oxxo.draw()
+    glTranslatef(3.7,0,0)
+    mini_oxxo.draw()
     glPopMatrix()
 
     glutSwapBuffers()

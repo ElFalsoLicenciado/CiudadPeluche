@@ -24,7 +24,7 @@ class LightPole:
         glPushMatrix()
         glRotatef(90, -1, 0, 0)
         glTranslatef(0, 0,s/8)
-        gluCylinder(quad, s / 8, s/8, 3, 16, 1)
+        gluCylinder(quad, s / 8, s/8, s*3.3, 16, 1)
         glPopMatrix()
 
         # Luz
