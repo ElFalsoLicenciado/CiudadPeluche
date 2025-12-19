@@ -15,7 +15,7 @@ from Street.Oxxo import Oxxo
 from Util.Landmarks import HAND_CONNECTIONS 
 
 # Modelo para landmarks
-MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
+MODEL_PATH = r"LL\\hand_landmarker.task"
 
 w, h = 800, 600
 # Ángulo de rotación inicial
