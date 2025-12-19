@@ -22,6 +22,13 @@ square_offset_z = 0.0
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
 
+minion_angle = 0.0
+minion_motion = 1
+
+fish_angle = 0.0
+
+
+
 w, h = 800, 600
 # Ángulo de rotación inicial
 angle = 0.0
@@ -54,6 +61,27 @@ def reshape(width, frame_height):
     global w, h
     w, h = width, max(frame_height, 1)
     glViewport(0, 0, w, h)
+
+def minion_rotation():
+    global minion_angle, minion_motion
+
+
+    minion_angle += 1 * minion_motion
+    if minion_angle >= 360:
+        minion_motion *= -1
+    if minion_angle <= 0:
+        minion_motion *= -1
+
+def fish_rotation():
+    global fish_angle
+
+    fish_angle += 30
+
+
+    if fish_angle >= 360:
+        fish_angle = 0
+
+
 
 def parametric_square(scale=1.0):
     global square_t, square_offset_x, square_offset_z
@@ -223,9 +251,12 @@ def ground():
     end_textured_draw()
 
 def display():
-    global angle
+    global angle, minion_angle, fish_angle
 
     parametric_square(23)
+    minion_rotation()
+    fish_rotation()
+    sin_a = math.sin(math.radians(minion_angle))
 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -236,7 +267,7 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 40, 4, # (0, 100, 1) Para vista aérea
+    gluLookAt(0, 20, 4, # (0, 100, 1) Para vista aérea
               0, 0, 0,
               0, 1, 0
     )
@@ -320,40 +351,46 @@ def display():
     # MINION #####################
 
     glPushMatrix()
-    glTranslatef(-3, 0, 2)
+    glTranslatef(-2.2 + (-0.1 * minion_angle * 0.3), 0 +sin_a + 1, 5)
     # glRotatef(45,0,0,0)
     normal_minion.draw()
     glPopMatrix()
 
     # FISH #######################
 
+    sin_angle = math.sin(math.radians(fish_angle))
+    cos_angle = math.cos(math.radians(fish_angle))
+    radius = 0.01
+
+    print(f"{sin_angle} and {cos_angle} ")
+
     glPushMatrix()
-    glTranslatef(0, 0, -6)
-    # glRotatef(45,0,0,0)
+    glTranslatef(0+radius*cos_angle, 0, -6+radius*sin_angle)
+    glRotatef(-fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(0.5, 0, -6)
-    glRotatef(180,0,1,0)
+    glTranslatef(0.5+radius*cos_angle, 0, -6+radius*sin_angle)
+    glRotatef(fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(-6, 0, 6)
-    # glRotatef(45,0,0,0)
+    glTranslatef(-6+radius*cos_angle, 0, 6+radius*sin_angle)
+    glRotatef(-fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(-5.9, 0, 5.7)
-    glRotatef(180, 0, 1, 0)
+    glTranslatef(-5.9+radius*cos_angle, 0, 5.7+radius*sin_angle)
+    glRotatef(-fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(-5.7, 0, 6.1)
-    glRotatef(90, 0, 1, 0)
+    glTranslatef(-5.7+radius*cos_angle, 0, 6.1+radius*sin_angle)
+    glRotatef(fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
