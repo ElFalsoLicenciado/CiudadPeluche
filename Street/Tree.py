@@ -4,7 +4,7 @@ from OpenGL.raw.GLUT import *
 
 quadric = None
 
-class Arbol:
+class Tree:
     def __init__(self, size=1):
         self.s = size
         global quadric
@@ -16,11 +16,6 @@ class Arbol:
         s = self.s
 
         global quadric
-        """
-        Árbol low-poly para PyOpenGL + GLUT/GLU.
-        Requiere: set_material(...) y quadric (GLUquadric) ya creados.
-        Coordenadas: (x, z) en el suelo (y=0).
-        """
 
         # Ajustes low-poly
         trunk_h = 1.1 * s

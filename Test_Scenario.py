@@ -4,15 +4,17 @@ from OpenGL.GLUT import *
 
 from Alive.Fish import Fish
 from Alive.Ferrari import Ferrari
-from Street.Arbol import Arbol
+from Street.Tree import Tree
 from Street.building import Building
+from Street.Oxxo import Oxxo
 
 angle = 0.0
 
 f1 = Fish(0.5)
 ferr = Ferrari()
-a1 = Arbol()
+a1 = Tree()
 b1 = Building()
+ox = Oxxo()
 
 w, h = 800, 600
 
@@ -44,15 +46,15 @@ def display():
     glRotate(angle, 0.3, 1, 0)
 
     #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-    glTranslatef(0, 0, 0)
-    f1.draw()
+    glTranslatef(-2, -1, 0)
+    ox.draw()
     #glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     glutSwapBuffers()
 
     glutKeyboardFunc(keyboard)
 
-    angle += 0.02
+    angle += 0.01
 
 def idle():
     glutPostRedisplay()
