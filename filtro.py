@@ -23,6 +23,36 @@ tex_craft_side = None
 tex_craft_front = None
 
 
+flower = [
+    "---12--",
+    "-13213-",
+    "134312-",
+    "11112--",
+    "-356---",
+    "---7---",
+    "---7---",
+    "---7---",
+    "56-8-66",
+    "-5-55--",
+    "--565--",]
+
+flower_colors = {
+    "1": (0.929, 0.188, 0.173),
+    "2": (0.608, 0.133, 0.102),
+    "3": (0.749, 0.145, 0.161),
+    "4": (0.455, 0.137, 0.012),
+    "5": (0.125, 0.275, 0.149),
+    "6": (0.149, 0.353, 0.145),
+    "7": (0.29, 0.561, 0.157),
+    "8": (0.169, 0.439, 0.165)
+
+}
+
+# Variables de animación
+rotation_angle = 0.0
+movement_offset = 0.0
+movement_direction = 1.0
+
 # Variables de Mediapipe
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
@@ -119,6 +149,16 @@ def setup_lights():
     glLightfv(GL_LIGHT1, GL_POSITION, (1, 1, 1, 0))
     glLightfv(GL_LIGHT1, GL_DIFFUSE, (0.5, 0.5, 0.5, 1))
 
+
+def update_motion(scale=1.0, chin=None):
+    global rotation_angle,movement_offset, movement_direction
+
+
+    rotation_angle += 5
+    if rotation_angle >= 360:
+        rotation_angle = 0  # Reiniciar el ángulo después de una vuelta completa
+
+
 # ============================================================
 # Dibujo de primitivas
 # ============================================================
@@ -191,11 +231,32 @@ def draw_textured_rectangle_side(p1, p2, texture=None):
     glBindTexture(GL_TEXTURE_2D, 0)
 
 
+def draw_polygon(polygon, color=(1, 1, 1)):
+    glLineWidth(1.0)
+    glColor3f(*color)
+    glBegin(GL_POLYGON)
+    for point in polygon:
+        glVertex3f(*point)
+    glEnd()
+
+
+def draw_pixel(x, y, size=0.05, color=(1, 0, 0)):
+    polygon = [
+        (x, y, 0),
+        (x + size, y, 0),
+        (x + size, y + size, 0),
+        (x, y + size, 0),
+    ]
+    draw_polygon(polygon, color)
+
+
 
 # ============================================================
 # Modelos
 # ============================================================
 def draw_floor():
+    glColor3f(1,1,1)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glBindTexture(GL_TEXTURE_2D, tex_floor)
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex3f(-5, -0.1, -5)
@@ -280,6 +341,18 @@ def draw_textured_cube(texture_top=None, texture_bottom=None, texture_side=None,
     glBindTexture(GL_TEXTURE_2D, 0)
 
 
+def draw_flower(origin_x=0, origin_y=0, pixel_size=0.05):
+    for y, row in enumerate(flower):
+        for x, cell in enumerate(row):
+            if cell != "-":
+                draw_pixel(
+                    origin_x + x * pixel_size,
+                    origin_y - y * pixel_size,
+                    pixel_size,
+                    flower_colors[cell]
+                )
+
+
 # ============================================================
 # Mundo
 # ============================================================
@@ -287,16 +360,28 @@ def draw_scene():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
 
-    gluLookAt(5, 2, 5,
-              0, 0, 0,
+    gluLookAt(0, 2, 5,
+              0,2 , -1,
               0, 1, 0)
 
     draw_floor()
+
     glDisable(GL_LIGHTING)
+    glPushMatrix()
     scale = 0.25
     glTranslatef(0, 1*scale, 0)
     glScalef(scale, scale, scale)
     draw_textured_cube(tex_craft_top, tex_craft_bottom, tex_craft_side, tex_craft_front)
+    glPopMatrix()
+
+
+    glPushMatrix()
+    scale = 1.0
+    glTranslatef(0, 1, 0)
+    glRotatef(0, 0, 1, 0)
+    glScalef(scale, scale, scale)
+    draw_flower()
+    glPopMatrix()
     glEnable(GL_LIGHTING)
 
     glfw.swap_buffers(window)
@@ -352,6 +437,8 @@ def main():
 
 
             draw_scene()
+            update_motion()
+
 
             frame_count += 1
             current_time = glfw.get_time()
