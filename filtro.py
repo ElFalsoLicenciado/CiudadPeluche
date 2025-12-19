@@ -161,12 +161,7 @@ def update_motion(scale=1.0, chin=None):
 
 def begin_solid_draw():
     glPushAttrib(
-        GL_CURRENT_BIT |
-        GL_ENABLE_BIT |
-        GL_LIGHTING_BIT |
-        GL_TEXTURE_BIT |
-        GL_LINE_BIT
-    )
+        GL_CURRENT_BIT | GL_ENABLE_BIT | GL_LIGHTING_BIT | GL_TEXTURE_BIT | GL_LINE_BIT )
 
 def end_solid_draw():
     glPopAttrib()
@@ -486,12 +481,22 @@ def draw_chingadera():
     draw_sphere(0, 0, 0, eye_size, (0,0,0))
     glPopMatrix()
 
+
+def draw_umbrella(umbrella_color=(1,1,1)):
+    draw_cone(0, 1.25, 0.15, 0.65, 0.25, umbrella_color)
+
+    draw_line((0,1.25,0.15),(0,0,0.15), (0.69,.69,.69), 10 )
+
+
 # ============================================================
 # Mundo
 # ============================================================
 def draw_scene():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
+
+    scale = 0.25
+    radius = 0.01
 
     gluLookAt(0, 2, 5,
               0,2 , -1,
@@ -501,7 +506,6 @@ def draw_scene():
 
     glDisable(GL_LIGHTING)
     glPushMatrix()
-    scale = 0.25
     glTranslatef(0, 1*scale, 0)
     glScalef(scale, scale, scale)
     draw_textured_cube(tex_craft_top, tex_craft_bottom, tex_craft_side, tex_craft_front)
@@ -517,12 +521,15 @@ def draw_scene():
     glPopMatrix()
     glEnable(GL_LIGHTING)
 
+    sin_angle = math.sin(math.radians(rotation_angle))
+    cos_angle = math.cos(math.radians(rotation_angle))
+
     glPushMatrix()
     # scale = 0.5
-    glTranslatef(0, 0.5, 2)
-    glRotatef(rotation_angle, 0, 1, 0)
+    glTranslatef(0+radius*cos_angle, 0.5, 2+radius*sin_angle)
+    glRotatef(-rotation_angle, 0, 1, 0)
     # glScalef(scale, scale, scale)
-    draw_chingadera()
+    draw_umbrella((0.753, 0.086, 0.165))
     glPopMatrix()
 
     glfw.swap_buffers(window)
