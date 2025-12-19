@@ -12,10 +12,15 @@ from Street.building import Building
 from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
-from Util.Landmarks import HAND_CONNECTIONS 
+from Util.Landmarks import HAND_CONNECTIONS
+import pygame
+
+square_t = 0.0
+square_offset_x = 0.0
+square_offset_z = 0.0
 
 # Modelo para landmarks
-MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
+MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
 
 w, h = 800, 600
 # Ángulo de rotación inicial
@@ -49,6 +54,31 @@ def reshape(width, frame_height):
     global w, h
     w, h = width, max(frame_height, 1)
     glViewport(0, 0, w, h)
+
+def parametric_square(scale=1.0):
+    global square_t, square_offset_x, square_offset_z
+
+    if square_t == 0:
+        if square_offset_x < 1.0*scale:
+            square_offset_x += 0.01*scale
+        else: square_t = 90
+
+    if square_t == 90:
+        if square_offset_z < 1.0*scale:
+            square_offset_z += 0.01*scale
+        else: square_t = 180
+
+    if square_t == 180:
+        if square_offset_x > 0.0:
+            square_offset_x -= 0.01*scale
+        else:
+            square_t = 270
+
+    if square_t == 270:
+        if square_offset_z > 0.0:
+            square_offset_z -= 0.01*scale
+        else:
+            square_t = 0
 
 # Generar texturas
 def load_texture(path):
@@ -195,6 +225,9 @@ def ground():
 def display():
     global angle
 
+    parametric_square(23)
+
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glMatrixMode(GL_PROJECTION)
@@ -203,8 +236,8 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, height, zoom, # (0, 100, 1) Para vista aérea
-              0, 4, 0,
+    gluLookAt(0, 40, 4, # (0, 100, 1) Para vista aérea
+              0, 0, 0,
               0, 1, 0
     )
 
@@ -327,8 +360,17 @@ def display():
     # FERRARI ####################
 
     glPushMatrix()
-    glTranslatef(-7, 0, 3)
-    # glRotatef(45,0,0,0)
+    glTranslatef(-11 + square_offset_x, 0.0, -11 + square_offset_z)
+
+    if square_t == 90:
+        glRotatef(270, 0, 1, 0)
+    if square_t == 180:
+        glRotatef(-180, 0, 1, 0)
+    if square_t == 0:
+        glRotatef(0, 0, 1, 0)    # glRotatef(45,0,0,0)
+    if square_t == 270:
+        glRotatef(90, 0, 1, 0)
+
     normal_ferrari.draw()
     glPopMatrix()
 
@@ -395,6 +437,8 @@ def main():
     global tracker
     from Util.Landmarks import LandmarksTracker  # si lo separas en archivo
 
+    pygame.mixer.init()
+
     tracker = LandmarksTracker(MODEL_PATH)
     tracker.start()
 
@@ -404,11 +448,14 @@ def main():
     glutCreateWindow(b"Ciudad P. Luche")
 
     load_texture("Street/vista-superior-arriba-es-mapa-calles-manzana_70347-4067.jpg")
+    pygame.mixer.music.load(
+        "C:/Users/User/Desktop/CiudadPeluche2/funkytown.mp3")
 
     init()
     glutReshapeFunc(reshape)
     glutDisplayFunc(display)
     glutIdleFunc(idle)
+    pygame.mixer.music.play()
     glutMainLoop()
 
 

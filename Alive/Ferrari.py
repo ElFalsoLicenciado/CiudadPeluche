@@ -2,6 +2,8 @@ from OpenGL.GL import *
 from OpenGL.raw.GLU import *
 from OpenGL.raw.GLUT import *
 
+
+
 quadric = gluNewQuadric()
 
 def draw_box(sx, sy, sz):
