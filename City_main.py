@@ -1,3 +1,5 @@
+import math
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -11,7 +13,10 @@ from Util.Landmarks import HAND_CONNECTIONS
 MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
 
 w, h = 800, 600
+# Ángulo de rotación inicial
 angle = 0.0
+# Zoom inicial
+zoom = 4
 # Declaración del rastreador de landmarks
 tracker = None
 
@@ -60,6 +65,7 @@ def draw_hand_2d(hands):
         for a, b in HAND_CONNECTIONS:
             glVertex2f(pts[a][0], pts[a][1])
             glVertex2f(pts[b][0], pts[b][1])
+        movement(pts,w)
         glEnd()
     glEnable(GL_DEPTH_TEST)
 
@@ -68,6 +74,48 @@ def draw_hand_2d(hands):
     glMatrixMode(GL_PROJECTION)
     glPopMatrix()
     glMatrixMode(GL_MODELVIEW)
+
+
+def movement(pts, frame_x):
+    global zoom, angle
+
+    # Mitad de la pantalla en eje X
+    screen_mid = frame_x / 2
+
+    # Distancia promedio entre todos los dedos
+    dist_prom = (dist(pts[4], pts[8]) + dist(pts[8], pts[12]) + dist(pts[12], pts[16]) + dist(pts[16], pts[20])) / 4
+    # Distancia entre la muñeca y el dedo medio
+    dist_wrist_middle = dist(pts[0], pts[12])
+    # Distancia entre la muñeca y el dedo pequeño
+    dist_wrist_pinky = dist(pts[0], pts[20])
+    # Distancia entre el dedo índice y el medio
+    dist_index_middle = dist(pts[8], pts[12])
+    # Distancia entre el dedo medio y la segunda articulación del dedo anular
+    dist_middle_ring_dip = dist(pts[12], pts[15])
+    # Distancia entre dedo anular y pequeño
+    dist_ring_pinky = dist(pts[16], pts[20])
+    # Verifica que la señal de movimiento sea correcta: Dedo indice y medio por encima de la mitad de la mano, lejos de los demás dedos
+    move_verify = pts[16][0] > pts[9][0] and pts[20][0] > pts[9][0] and dist_middle_ring_dip > 90
+
+    # Zoom hacia dentro si todos los dedos están juntos
+    if dist_prom < 30.0:
+        zoom += 0.001
+    # Zoom hacia afuera si todos los dedos están separados y lejos de la muñeca
+    if dist_prom > 90 and dist_wrist_middle > 70.0 and dist_wrist_pinky > 70.0 and dist_ring_pinky > 70:
+        zoom -= 0.001
+    # Habilita movimiento de la escena si el dedo índice y medio están juntos, y el verificador de movimiento es verdadero
+    if dist_index_middle < 30.0 and move_verify:
+        # Diferencia entre la mitad de la pantalla y la posición del dedo medio para velocidad de rotación
+        move_dist = screen_mid - pts[12][0]
+        angle += move_dist * 0.0001
+        print("Distancia: ", move_dist)
+
+
+def dist(p1, p2):
+    return math.sqrt(
+        (p1[0] - p2[0]) ** 2 +
+        (p1[1] - p2[1]) ** 2
+    )
 
 def ground():
     glColor3f(0,0.7,0)
@@ -79,7 +127,8 @@ def ground():
     glEnd()
 
 def display():
-    global angle
+    global angle, zoom
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     glMatrixMode(GL_PROJECTION)
@@ -88,7 +137,7 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 6, 4, # (0, 100, 1) Para vista aérea
+    gluLookAt(0, 6, zoom, # (0, 100, 1) Para vista aérea
               0, 0, 0,
               0, 1, 0
     )
@@ -121,11 +170,11 @@ def display():
     glPopMatrix()
 
     glutSwapBuffers()
-    angle += 0.1
-
 
 def idle():
+    global angle
     glutPostRedisplay()
+    angle += 0.0007
 
 
 def main():
