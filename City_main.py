@@ -12,7 +12,7 @@ from Street.building import Building
 from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
-from Util.Landmarks import HAND_CONNECTIONS
+from Util.Landmarks import HAND_CONNECTIONS 
 
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
@@ -206,8 +206,8 @@ def display():
     )
 
     # Callback para dibujar las manos
-    #hands = tracker.get_latest()
-    #draw_hand_2d(hands)
+    hands = tracker.get_latest()
+    draw_hand_2d(hands)
 
     glRotatef(angle, 0, 1, 0)
 
@@ -316,8 +316,8 @@ def main():
     global tracker
     from Util.Landmarks import LandmarksTracker  # si lo separas en archivo
 
-    #tracker = LandmarksTracker(MODEL_PATH)
-    #tracker.start()
+    tracker = LandmarksTracker(MODEL_PATH)
+    tracker.start()
 
     glutInit()
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
