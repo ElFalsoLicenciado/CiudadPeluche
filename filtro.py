@@ -159,6 +159,19 @@ def update_motion(scale=1.0, chin=None):
         rotation_angle = 0  # Reiniciar el ángulo después de una vuelta completa
 
 
+def begin_solid_draw():
+    glPushAttrib(
+        GL_CURRENT_BIT |
+        GL_ENABLE_BIT |
+        GL_LIGHTING_BIT |
+        GL_TEXTURE_BIT |
+        GL_LINE_BIT
+    )
+
+def end_solid_draw():
+    glPopAttrib()
+
+
 # ============================================================
 # Dibujo de primitivas
 # ============================================================
@@ -231,6 +244,22 @@ def draw_textured_rectangle_side(p1, p2, texture=None):
     glBindTexture(GL_TEXTURE_2D, 0)
 
 
+def draw_line(p1, p2, color=(1, 0, 0), width=2.0):
+    begin_solid_draw()
+
+    glDisable(GL_LIGHTING)
+    glDisable(GL_TEXTURE_2D)
+    glLineWidth(width)
+    glColor3f(*color)
+
+    glBegin(GL_LINES)
+    glVertex3f(*p1)
+    glVertex3f(*p2)
+    glEnd()
+
+    end_solid_draw()
+
+
 def draw_polygon(polygon, color=(1, 1, 1)):
     glLineWidth(1.0)
     glColor3f(*color)
@@ -250,13 +279,121 @@ def draw_pixel(x, y, size=0.05, color=(1, 0, 0)):
     draw_polygon(polygon, color)
 
 
+def draw_sphere(x, y, z, radius, color=(1, 1, 1)):
+    begin_solid_draw()
+
+    glDisable(GL_TEXTURE_2D)
+    glEnable(GL_LIGHTING)
+    glColor3f(*color)
+
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    quadric = gluNewQuadric()
+    gluQuadricNormals(quadric, GLU_SMOOTH)
+    gluSphere(quadric, radius, 20, 20)
+    gluDeleteQuadric(quadric)
+    glPopMatrix()
+
+    end_solid_draw()
+
+
+def draw_cone(x, y, z, base_radius, height, color=(1, 0, 0)):
+    glPushMatrix()
+    glTranslatef(x, y, z)
+    glRotatef(0, 0, 0, 1)
+    glRotatef(-90, 1, 0, 0)
+    glColor3f(*color)
+    quad = gluNewQuadric()
+    gluQuadricNormals(quad, GLU_SMOOTH)
+    gluCylinder(quad, base_radius, 0, height, 16, 16)
+    gluDeleteQuadric(quad)
+    glPopMatrix()
+
+
+def draw_textured_cube(texture_top=None, texture_bottom=None, texture_side=None, texture_front=None):
+        glBindTexture(GL_TEXTURE_2D, texture_front)
+
+        glBegin(GL_QUADS)
+
+        # Frente (z = +1)
+        glColor3f(1, 1, 1)
+        glTexCoord2f(0, 0); glVertex3f(-1, -1, 1)
+        glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
+        glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+        glTexCoord2f(0, 1); glVertex3f(-1, 1, 1)
+        glEnd()
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glBindTexture(GL_TEXTURE_2D, texture_front)
+        glBegin(GL_QUADS)
+        # Atrás (z = -1)
+        glColor3f(1, 1, 1)
+
+        glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+        glTexCoord2f(1, 0); glVertex3f(-1, 1, -1)
+        glTexCoord2f(1, 1); glVertex3f(1, 1, -1)
+        glTexCoord2f(0, 1); glVertex3f(1, -1, -1)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glBindTexture(GL_TEXTURE_2D, texture_side)
+        glBegin(GL_QUADS)
+        # Izquierda (x = -1)
+        glColor3f(1, 1, 1)
+        glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+        glTexCoord2f(1, 0); glVertex3f(-1, -1, 1)
+        glTexCoord2f(1, 1); glVertex3f(-1, 1, 1)
+        glTexCoord2f(0, 1); glVertex3f(-1, 1, -1)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glBindTexture(GL_TEXTURE_2D, texture_side)
+        glBegin(GL_QUADS)
+        # Derecha (x = +1)
+        glColor3f(1, 1, 1)
+        glTexCoord2f(0, 0); glVertex3f(1, -1, -1)
+        glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
+        glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+        glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
+        glEnd()
+
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glBindTexture(GL_TEXTURE_2D, texture_top)
+        glBegin(GL_QUADS)
+        # Arriba (y = +1)
+        glColor3f(1, 1, 1)
+        glTexCoord2f(0, 0); glVertex3f(-1, 1, -1)
+        glTexCoord2f(1, 0); glVertex3f(-1, 1, 1)
+        glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
+        glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
+        glBindTexture(GL_TEXTURE_2D, texture_bottom)
+        glBegin(GL_QUADS)
+        # Abajo (y = -1)
+        glColor3f(1, 1, 1)
+        glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
+        glTexCoord2f(1, 0); glVertex3f(1, -1, -1)
+        glTexCoord2f(1, 1); glVertex3f(1, -1, 1)
+        glTexCoord2f(0, 1); glVertex3f(-1, -1, 1)
+
+        glEnd()
+        glBindTexture(GL_TEXTURE_2D, 0)
+
 
 # ============================================================
 # Modelos
 # ============================================================
 def draw_floor():
+    begin_solid_draw()
+
+    glEnable(GL_TEXTURE_2D)
+    glDisable(GL_LIGHTING)
     glColor3f(1,1,1)
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
     glBindTexture(GL_TEXTURE_2D, tex_floor)
     glBegin(GL_QUADS)
     glTexCoord2f(0, 0); glVertex3f(-5, -0.1, -5)
@@ -266,82 +403,17 @@ def draw_floor():
     glEnd()
     glBindTexture(GL_TEXTURE_2D, 0)
 
-def draw_textured_cube(texture_top=None, texture_bottom=None, texture_side=None, texture_front=None):
-    glBindTexture(GL_TEXTURE_2D, texture_front)
+    end_solid_draw()
 
-    glBegin(GL_QUADS)
-
-    # Frente (z = +1)
-    glColor3f(1, 1, 1)
-    glTexCoord2f(0, 0); glVertex3f(-1, -1, 1)
-    glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
-    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
-    glTexCoord2f(0, 1); glVertex3f(-1, 1, 1)
-    glEnd()
-
-    glBindTexture(GL_TEXTURE_2D, 0)
-
-
-    glBindTexture(GL_TEXTURE_2D, texture_front)
-    glBegin(GL_QUADS)
-    # Atrás (z = -1)
-    glColor3f(1, 1, 1)
-
-    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
-    glTexCoord2f(1, 0); glVertex3f(-1, 1, -1)
-    glTexCoord2f(1, 1); glVertex3f(1, 1, -1)
-    glTexCoord2f(0, 1); glVertex3f(1, -1, -1)
-    glEnd()
-    glBindTexture(GL_TEXTURE_2D, 0)
-
-    glBindTexture(GL_TEXTURE_2D, texture_side)
-    glBegin(GL_QUADS)
-    # Izquierda (x = -1)
-    glColor3f(1, 1, 1)
-    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
-    glTexCoord2f(1, 0); glVertex3f(-1, -1, 1)
-    glTexCoord2f(1, 1); glVertex3f(-1, 1, 1)
-    glTexCoord2f(0, 1); glVertex3f(-1, 1, -1)
-    glEnd()
-    glBindTexture(GL_TEXTURE_2D, 0)
-
-    glBindTexture(GL_TEXTURE_2D, texture_side)
-    glBegin(GL_QUADS)
-    # Derecha (x = +1)
-    glColor3f(1, 1, 1)
-    glTexCoord2f(0, 0); glVertex3f(1, -1, -1)
-    glTexCoord2f(1, 0); glVertex3f(1, -1, 1)
-    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
-    glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
-    glEnd()
-
-    glBindTexture(GL_TEXTURE_2D, 0)
-
-    glBindTexture(GL_TEXTURE_2D, texture_top)
-    glBegin(GL_QUADS)
-    # Arriba (y = +1)
-    glColor3f(1, 1, 1)
-    glTexCoord2f(0, 0); glVertex3f(-1, 1, -1)
-    glTexCoord2f(1, 0); glVertex3f(-1, 1, 1)
-    glTexCoord2f(1, 1); glVertex3f(1, 1, 1)
-    glTexCoord2f(0, 1); glVertex3f(1, 1, -1)
-    glEnd()
-    glBindTexture(GL_TEXTURE_2D, 0)
-
-    glBindTexture(GL_TEXTURE_2D, texture_bottom)
-    glBegin(GL_QUADS)
-    # Abajo (y = -1)
-    glColor3f(1, 1, 1)
-    glTexCoord2f(0, 0); glVertex3f(-1, -1, -1)
-    glTexCoord2f(1, 0); glVertex3f(1, -1, -1)
-    glTexCoord2f(1, 1); glVertex3f(1, -1, 1)
-    glTexCoord2f(0, 1); glVertex3f(-1, -1, 1)
-
-    glEnd()
-    glBindTexture(GL_TEXTURE_2D, 0)
 
 
 def draw_flower(origin_x=0, origin_y=0, pixel_size=0.05):
+    begin_solid_draw()
+
+    glDisable(GL_LIGHTING)
+    glDisable(GL_TEXTURE_2D)
+    glColor3f(1,1,1)
+
     for y, row in enumerate(flower):
         for x, cell in enumerate(row):
             if cell != "-":
@@ -352,6 +424,67 @@ def draw_flower(origin_x=0, origin_y=0, pixel_size=0.05):
                     flower_colors[cell]
                 )
 
+    end_solid_draw()
+
+
+def draw_chingadera():
+
+    angle = math.sin(math.radians(30))
+
+    color_patas = (0.776, 0.616, 0.529)
+    color_cuerpo = (0.208, 0.157, 0.161)
+    color_pico = (0.239, 0.231, 0.227)
+
+    pata_x = 0.075
+
+    eye_x = 0.07
+    eye_y = 1.12
+    eye_z = 0.24
+    eye_size = 0.03
+
+
+    # Pata izquierda
+    draw_line((-pata_x, 0.1, 0), (-pata_x, 1, 0), color_patas, 3.0 )
+    draw_line((-pata_x, 0.1, 0), (-pata_x+(-pata_x*angle), 0.1, 0+(0.5*angle)), color_patas, 2.5 )
+    draw_line((-pata_x, 0.1, 0), (-pata_x, 0.1, 0.5*angle), color_patas, 2.5 )
+    draw_line((-pata_x, 0.1, 0), (-pata_x-(-pata_x*angle), 0.1, 0+(0.5*angle)), color_patas, 2.5 )
+
+
+    # Pata derecha
+    draw_line((pata_x, 0.1, 0), (pata_x, 1, 0), color_patas, 3.0 )
+    draw_line((pata_x, 0.1, 0), (pata_x+(pata_x*angle), 0.1, 0+(0.5*angle)), color_patas, 2.5 )
+    draw_line((pata_x, 0.1, 0), (pata_x, 0.1, 0.5*angle), color_patas, 2.5 )
+    draw_line((pata_x, 0.1, 0), (pata_x-(pata_x*angle), 0.1, 0+(0.5*angle)), color_patas, 2.5 )
+
+    # Cuerpo,
+    glPushMatrix()
+    glScalef(1, 1, 1.5)
+    draw_sphere(0, 1, 0, 0.15, color_cuerpo)
+    glPopMatrix()
+
+    # Cabeza
+    glPushMatrix()
+    glScalef(1, 1, 1.25)
+    draw_sphere(0, 1.10, 0.15, 0.1, color_cuerpo)
+    glPopMatrix()
+
+    # Pico
+    glPushMatrix()
+    glTranslatef(0, 1.25, -1.05)
+    glRotatef(90, 1, 0, 0)
+    draw_cone(0, 1.25, 0.15, 0.05, 0.3, color_pico)
+    glPopMatrix()
+
+    # Ojos
+
+    glPushMatrix()
+    glTranslatef(eye_x, eye_y, eye_z)
+    draw_sphere(0, 0, 0, eye_size, (0,0,0))
+    glPopMatrix()
+    glPushMatrix()
+    glTranslatef(eye_x * -1, eye_y, eye_z)
+    draw_sphere(0, 0, 0, eye_size, (0,0,0))
+    glPopMatrix()
 
 # ============================================================
 # Mundo
@@ -383,6 +516,14 @@ def draw_scene():
     draw_flower()
     glPopMatrix()
     glEnable(GL_LIGHTING)
+
+    glPushMatrix()
+    # scale = 0.5
+    glTranslatef(0, 0.5, 2)
+    glRotatef(rotation_angle, 0, 1, 0)
+    # glScalef(scale, scale, scale)
+    draw_chingadera()
+    glPopMatrix()
 
     glfw.swap_buffers(window)
 
