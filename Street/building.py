@@ -1,11 +1,16 @@
 from OpenGL.GL import *
 
 class Building:
-    def __init__(self, size=1.0):
+    def __init__(self, size=1.0, windows_separation=0.3, windows_size=0.6):
         self.s = size
+        self.sp = windows_separation
+        self.ws = windows_size
 
     def draw(self):
         s = self.s
+        sp = self.sp
+        ws = self.ws
+
         b0 = (-s, 0, s)
         b1 = (-s, 0, -s)
         b2 = (s, 0, -s)
@@ -61,13 +66,14 @@ class Building:
 
         glEnd()
 
-        ventanas(s)
+        ventanas(s,sp,ws)
 
 
-def ventanas(s):
+def ventanas(s,sp,ws):
+
     altura = int(s * 4)
-    win_size = s * 0.6
-    sep = s * 0.3
+    win_size = s * ws
+    sep = s * sp
     offset = 0.01
 
     glColor3f(0, 0, 0)

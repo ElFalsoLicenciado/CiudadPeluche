@@ -33,7 +33,8 @@ mini_building = Building(1)
 normal_minion = Minion(0.5)
 normal_fish = Fish(0.1)
 normal_ferrari = Ferrari(0.6)
-normal_arbol = Tree(1.2)
+normal_tree = Tree(1.2)
+big_tree = Tree(2)
 normal_light_pole = LightPole(1)
 normal_oxxo = Oxxo(1)
 
@@ -200,14 +201,14 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 40, 1, # (0, 100, 1) Para vista aérea
-              0, 0, 0,
+    gluLookAt(0, 40, 2, # (0, 100, 1) Para vista aérea
+              0, 4, 0,
               0, 1, 0
     )
 
     # Callback para dibujar las manos
-    #hands = tracker.get_latest()
-    #draw_hand_2d(hands)
+    hands = tracker.get_latest()
+    draw_hand_2d(hands)
 
     glRotatef(angle, 0, 1, 0)
 
@@ -216,10 +217,8 @@ def display():
     # LIGHT_POLE ##############
 
     glPushMatrix()
-    glTranslatef(0,0,0)
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    glTranslatef(-1.8,0,-0.5)
     normal_light_pole.draw()
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     glPopMatrix()
 
     # BUILDING ################
@@ -235,6 +234,20 @@ def display():
     # glRotatef(45,0,0,0)
     mini_building.draw()
     glPopMatrix()
+
+    # CONGLOMERADO ##
+    glPushMatrix()
+    glTranslatef(8.75,0,-3.7)
+    mini_building.draw()
+    glTranslatef(0,0,2.5)
+    mini_building.draw()
+    glTranslatef(0, 0, 2)
+    mini_building.draw()
+    glTranslatef(0, 0, 2.5)
+    mini_building.draw()
+    glPopMatrix()
+
+    # MINION #####################
 
     glPushMatrix()
     glTranslatef(-3, 0, 2)
@@ -287,7 +300,13 @@ def display():
     glPushMatrix()
     glTranslatef(10, 0, 0)
     # glRotatef(45,0,0,0)
-    normal_arbol.draw()
+    normal_tree.draw()
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(2.5, 0, -3.2)
+    # glRotatef(45,0,0,0)
+    big_tree.draw()
     glPopMatrix()
 
     # OXXO ########################
@@ -316,8 +335,8 @@ def main():
     global tracker
     from Util.Landmarks import LandmarksTracker  # si lo separas en archivo
 
-    #tracker = LandmarksTracker(MODEL_PATH)
-    #tracker.start()
+    tracker = LandmarksTracker(MODEL_PATH)
+    tracker.start()
 
     glutInit()
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH)
