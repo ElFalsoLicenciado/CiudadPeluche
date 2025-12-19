@@ -61,6 +61,72 @@ class Building:
 
         glEnd()
 
+        ventanas(s)
+
+
+def ventanas(s):
+    altura = int(s * 4)
+    win_size = s * 0.6
+    sep = s * 0.3
+    offset = 0.01
+
+    glColor3f(0, 0, 0)
+    glBegin(GL_QUADS)
+
+    # ---------- PARED FRONTAL (Z = -s) ----------
+    z = -s - offset
+    y = sep
+    while y + win_size < altura:
+        x = -s + sep
+        while x + win_size < s:
+            glVertex3f(x, y, z)
+            glVertex3f(x + win_size, y, z)
+            glVertex3f(x + win_size, y + win_size, z)
+            glVertex3f(x, y + win_size, z)
+            x += win_size + sep
+        y += win_size + sep
+
+    # ---------- PARED TRASERA (Z = +s) ----------
+    z = s + offset
+    y = sep
+    while y + win_size < altura:
+        x = -s + sep
+        while x + win_size < s:
+            glVertex3f(x, y, z)
+            glVertex3f(x, y + win_size, z)
+            glVertex3f(x + win_size, y + win_size, z)
+            glVertex3f(x + win_size, y, z)
+            x += win_size + sep
+        y += win_size + sep
+
+    # ---------- PARED IZQUIERDA (X = -s) ----------
+    x = -s - offset
+    y = sep
+    while y + win_size < altura:
+        z = -s + sep
+        while z + win_size < s:
+            glVertex3f(x, y, z)
+            glVertex3f(x, y + win_size, z)
+            glVertex3f(x, y + win_size, z + win_size)
+            glVertex3f(x, y, z + win_size)
+            z += win_size + sep
+        y += win_size + sep
+
+    # ---------- PARED DERECHA (X = +s) ----------
+    x = s + offset
+    y = sep
+    while y + win_size < altura:
+        z = -s + sep
+        while z + win_size < s:
+            glVertex3f(x, y, z)
+            glVertex3f(x, y, z + win_size)
+            glVertex3f(x, y + win_size, z + win_size)
+            glVertex3f(x, y + win_size, z)
+            z += win_size + sep
+        y += win_size + sep
+
+    glEnd()
+
 def suma(t1,t2):
     return tuple(map(sum, zip(t1, t2)))
 
