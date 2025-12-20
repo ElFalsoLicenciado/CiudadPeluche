@@ -8,6 +8,7 @@ from PIL import Image
 from Alive.Minion import Minion
 from Alive.Fish import Fish
 from Alive.Ferrari import Ferrari
+from Alive.Chingadera import Chingadera
 from Street.building import Building
 from Street.flower import Flower
 from Street.light_pole import LightPole
@@ -29,6 +30,8 @@ minion_t_x = 0.0
 minion_motion = 1
 
 fish_angle = 0.0
+
+damnn_angle = 0.0
 
 
 
@@ -52,6 +55,7 @@ normal_tree = Tree(1.2)
 big_tree = Tree(2)
 normal_light_pole = LightPole(0.75)
 normal_flower = Flower()
+normal_chingadera = Chingadera()
 
 normal_oxxo = Oxxo(1)
 mini_oxxo = Oxxo(0.7)
@@ -308,6 +312,28 @@ def draw_flowers():
                 z_offset -= space
             else: break
 
+def draw_damnn():
+    global damnn_angle
+    damnn_angle += 5
+
+    if damnn_angle >= 360:
+        damnn_angle = 0  # Reiniciar el ángulo después de una vuelta completa
+
+    sin_angle = math.sin(math.radians(damnn_angle))
+    cos_angle = math.cos(math.radians(damnn_angle))
+    scale = 1
+    radius = 1.5
+
+    damnn_x = 0.1 *1
+    damnn_z = -5.7 *1
+
+    glPushMatrix()
+    glTranslatef(damnn_x+radius*cos_angle, 1, damnn_z+radius*sin_angle)
+    glRotatef(-damnn_angle, 0, 1, 0)
+    glScalef(scale, scale, scale)
+    Chingadera.draw()
+    glPopMatrix()
+
 
 def display():
     global angle, minion_t, fish_angle
@@ -361,6 +387,8 @@ def display():
     glTranslatef(4.5,-9,0.01)
     gluDisk(quadric, 0, 1.55, 16, 8)
     glPopMatrix()
+
+    draw_damnn()
 
     # BUILDING ################
 
