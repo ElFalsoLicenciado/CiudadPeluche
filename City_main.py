@@ -9,6 +9,7 @@ from Alive.Minion import Minion
 from Alive.Fish import Fish
 from Alive.Ferrari import Ferrari
 from Street.building import Building
+from Street.flower import Flower
 from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
@@ -22,7 +23,9 @@ square_offset_z = 0.0
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
 
-minion_angle = 0.0
+minion_t = 0.0
+minion_t_y = 0.0
+minion_t_x = 0.0
 minion_motion = 1
 
 fish_angle = 0.0
@@ -48,6 +51,7 @@ normal_ferrari = Ferrari(0.6)
 normal_tree = Tree(1.2)
 big_tree = Tree(2)
 normal_light_pole = LightPole(0.75)
+normal_flower = Flower()
 
 normal_oxxo = Oxxo(1)
 mini_oxxo = Oxxo(0.7)
@@ -62,15 +66,28 @@ def reshape(width, frame_height):
     w, h = width, max(frame_height, 1)
     glViewport(0, 0, w, h)
 
-def minion_rotation():
-    global minion_angle, minion_motion
+def minion_jump():
+    global minion_t, minion_motion, minion_t_y, minion_t_x
 
+    print(f"x(t): {minion_t_x} y(t): {minion_t_y} t: {minion_t}")
 
-    minion_angle += 1 * minion_motion
-    if minion_angle >= 360:
-        minion_motion *= -1
-    if minion_angle <= 0:
-        minion_motion *= -1
+    minion_t -= 0.01 * minion_motion
+    minion_t_y = -8*(minion_t**2)-4*minion_t
+    minion_t_x -= 0.01 *minion_motion
+
+    if minion_motion == 1:
+        if minion_t_x <= -3:
+            minion_motion *= -1
+
+        if minion_t <= -0.5:
+            minion_t = 0.0
+
+    if minion_motion == -1:
+        if minion_t_x >= 0:
+            minion_motion *= -1
+
+        if minion_t >= 0:
+            minion_t = -0.5
 
 def fish_rotation():
     global fish_angle
@@ -224,8 +241,9 @@ def movement(pts, frame_x):
         # Diferencia entre la mitad de la pantalla y la posición del dedo medio para velocidad de rotación
         move_dist = screen_mid - pts[12][0]
         angle += move_dist * 0.001
-        print("Distancia: ", move_dist)
-    # Disminuye la altura de la cámara al solo levantar el meñique
+        # print("Distancia: ", move_dist)
+    # Disminuye la altura de la cámara al
+    # solo levantar el meñique
     if only_pinky and dist(pts[20],pts[15]) > 40 and dist_prom < 60:
         height -= 0.005
     # Aumenta la altura de la cámara al solo levantar el índice
@@ -251,12 +269,11 @@ def ground():
     end_textured_draw()
 
 def display():
-    global angle, minion_angle, fish_angle
+    global angle, minion_t, fish_angle
 
     parametric_square(23)
-    minion_rotation()
+    minion_jump()
     fish_rotation()
-    sin_a = math.sin(math.radians(minion_angle))
 
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -351,7 +368,7 @@ def display():
     # MINION #####################
 
     glPushMatrix()
-    glTranslatef(-2.2 + (-0.1 * minion_angle * 0.3), 0 +sin_a + 1, 5)
+    glTranslatef(-2.2 + (2.2*minion_t_x), minion_t_y*2, 5)
     # glRotatef(45,0,0,0)
     normal_minion.draw()
     glPopMatrix()
@@ -362,7 +379,7 @@ def display():
     cos_angle = math.cos(math.radians(fish_angle))
     radius = 0.01
 
-    print(f"{sin_angle} and {cos_angle} ")
+    # print(f"{sin_angle} and {cos_angle} ")
 
     glPushMatrix()
     glTranslatef(0+radius*cos_angle, 0, -6+radius*sin_angle)
