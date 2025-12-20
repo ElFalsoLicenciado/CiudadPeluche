@@ -69,7 +69,6 @@ def reshape(width, frame_height):
 def minion_jump():
     global minion_t, minion_motion, minion_t_y, minion_t_x
 
-    print(f"x(t): {minion_t_x} y(t): {minion_t_y} t: {minion_t}")
 
     minion_t -= 0.01 * minion_motion
     minion_t_y = -8*(minion_t**2)-4*minion_t
@@ -104,12 +103,12 @@ def parametric_square(scale=1.0):
     global square_t, square_offset_x, square_offset_z
 
     if square_t == 0:
-        if square_offset_x < 1.0*scale:
+        if square_offset_x < 1.0*(scale-0.5):
             square_offset_x += 0.01*scale
         else: square_t = 90
 
     if square_t == 90:
-        if square_offset_z < 1.0*scale:
+        if square_offset_z < 1.0*(scale-0.5):
             square_offset_z += 0.01*scale
         else: square_t = 180
 
@@ -268,6 +267,48 @@ def ground():
 
     end_textured_draw()
 
+def draw_flowers():
+    # Considerando que el mapa es 30x30
+    # (-15,0,-15) a (15,0,15)
+
+    x_max = 14.5
+    z_max = 14
+
+    square_side = 0
+    x_offset = -1*x_max
+    z_offset = -1*z_max
+    space = 2
+
+    while True:
+
+        glPushMatrix()
+        glTranslatef(x_offset, 0.0, z_offset)
+        glScalef(2,2,2)
+        Flower.draw()
+        glPopMatrix()
+
+        if square_side == 0:
+            if x_offset < x_max-1:
+                x_offset += space
+            else: square_side = 1
+
+        if square_side== 1:
+            if z_offset < z_max-0.5:
+                z_offset += space
+            else: square_side = 2
+
+        if square_side == 2:
+            if x_offset > -1*x_max:
+                x_offset -= space
+            else:
+                square_side = 3
+
+        if square_side == 3:
+            if z_offset > -1*z_max:
+                z_offset -= space
+            else: break
+
+
 def display():
     global angle, minion_t, fish_angle
 
@@ -284,10 +325,10 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 20, 4, # (0, 100, 1) Para vista aérea
+    gluLookAt(0, 40, 4, # (0, 100, 1) Para vista aérea
               0, 0, 0,
               0, 1, 0
-    )
+              )
 
     # Callback para dibujar las manos
     hands = tracker.get_latest()
@@ -364,6 +405,9 @@ def display():
     glTranslatef(0, 0, 1.5)
     mini_building.draw()
     glPopMatrix()
+
+    # FLORES
+    draw_flowers()
 
     # MINION #####################
 
