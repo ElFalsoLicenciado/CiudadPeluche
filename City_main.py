@@ -436,8 +436,8 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    # gluLookAt(-6, 2, -0.7, # (0, 100, 1) Para vista aérea
-    #           -3.5, 0, -0.7,
+    # gluLookAt(-6.4, 2, 8, # (0, 100, 1) Para vista aérea
+    #           -6.4, 0, 6,
     #           0, 1, 0)
 
     gluLookAt(0, 40, 2,  # (0, 100, 1) Para vista aérea
@@ -699,7 +699,7 @@ def main():
 
     load_texture("Street/vista-superior-arriba-es-mapa-calles-manzana_70347-4067.jpg")
     pygame.mixer.music.load(
-        "C:/Users/User/Desktop/CiudadPeluche2/funkytown.mp3")
+        "funkytown.mp3")
 
     init()
     glutReshapeFunc(reshape)
