@@ -14,6 +14,7 @@ from Street.flower import Flower
 from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
+from Street.craftin_table import Crafting
 from Util.Landmarks import HAND_CONNECTIONS
 import pygame
 
@@ -23,13 +24,20 @@ square_offset_z = 0.0
 
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
-
+# Variables asbestianas
 minion_t = 0.0
 minion_t_y = 0.0
 minion_t_x = 0.0
 minion_motion = 1
 
 fish_angle = 0.0
+
+ahh_fish_t = 0.0
+ahh_fish_x = 0.0
+ahh_fish_y = 0.0
+ahh_fish_angle = 0.0
+ahh_fish_motion = 1
+
 
 damnn_angle = 0.0
 
@@ -56,6 +64,7 @@ big_tree = Tree(2)
 normal_light_pole = LightPole(0.75)
 normal_flower = Flower()
 normal_chingadera = Chingadera()
+normal_crafting = None
 
 normal_oxxo = Oxxo(1)
 mini_oxxo = Oxxo(0.7)
@@ -95,8 +104,7 @@ def minion_jump():
 def fish_rotation():
     global fish_angle
 
-    fish_angle += 30
-
+    fish_angle += 5
 
     if fish_angle >= 360:
         fish_angle = 0
@@ -281,38 +289,58 @@ def draw_flowers():
     square_side = 0
     x_offset = -1*x_max
     z_offset = -1*z_max
+    flower_angle = 0
     space = 2
+
 
     while True:
 
         glPushMatrix()
-        glTranslatef(x_offset, 0.0, z_offset)
+        glTranslatef(x_offset, 1.0, z_offset)
         glScalef(2,2,2)
         Flower.draw()
         glPopMatrix()
 
         if square_side == 0:
-            if x_offset < x_max-1:
-                x_offset += space
-            else: square_side = 1
-
-        if square_side== 1:
-            if z_offset < z_max-0.5:
-                z_offset += space
-            else: square_side = 2
-
-        if square_side == 2:
-            if x_offset > -1*x_max:
-                x_offset -= space
+            if x_offset < x_max-1: x_offset += space
             else:
-                square_side = 3
+                square_side = 1
+                z_offset = z_max
+                x_offset = x_max+1
 
-        if square_side == 3:
-            if z_offset > -1*z_max:
+        if square_side == 1:
+            if x_offset > -1*x_max:  x_offset -= space
+            else:
+                square_side = 0
+                z_offset = -(z_max-1.5)
+                x_offset = x_max-0.5
+                break
+
+    while True:
+
+        glPushMatrix()
+        glTranslatef(x_offset, 1.0, z_offset)
+        glRotatef(90,0,1,0)
+        glScalef(2, 2, 2)
+        Flower.draw()
+        glPopMatrix()
+
+        if square_side == 0:
+            if z_offset < z_max - 1:
+                z_offset += space
+            else:
+                square_side = 1
+                z_offset = z_max+1.5
+                x_offset = -x_max+0.25
+
+        if square_side == 1:
+            if z_offset > -1 * (z_max-3):
                 z_offset -= space
-            else: break
+            else:
+                break
 
-def draw_damnn():
+
+def draw_damnnnnnnnn():
     global damnn_angle
     damnn_angle += 5
 
@@ -334,9 +362,38 @@ def draw_damnn():
     Chingadera.draw()
     glPopMatrix()
 
+def draw_fucking_amazing_fish():
+    global ahh_fish_t, ahh_fish_x, ahh_fish_y, ahh_fish_motion, ahh_fish_angle
+
+    if ahh_fish_motion == 1:
+        ahh_fish_t -= 0.025 * ahh_fish_motion
+        ahh_fish_y = -(ahh_fish_t ** 2) - ahh_fish_t
+        ahh_fish_angle = math.degrees(math.atan(-2*ahh_fish_t - 1))
+        if ahh_fish_x <= -1:
+            ahh_fish_motion *= -1
+
+    if ahh_fish_motion == -1:
+        ahh_fish_angle = 0
+        ahh_fish_t -= 0.01 * ahh_fish_motion
+        ahh_fish_y = -0.1
+        if ahh_fish_x >= 0:
+            ahh_fish_motion *= -1
+
+    ahh_fish_x = ahh_fish_t
+
+    glPushMatrix()
+    glTranslatef(-6.4 - ahh_fish_t, ahh_fish_y, 6.0)
+    glRotatef(-ahh_fish_angle,0,0,1)
+    normal_fish.draw()
+    glPopMatrix()
+
+
 
 def display():
     global angle, minion_t, fish_angle
+    global normal_crafting
+
+    normal_crafting = Crafting()
 
     parametric_square(23)
     minion_jump()
@@ -349,12 +406,20 @@ def display():
     glLoadIdentity()
     gluPerspective(40, w / h, 0.1, 100.0)
 
+
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 40, 4, # (0, 100, 1) Para vista aérea
-              0, 0, 0,
-              0, 1, 0
-              )
+    gluLookAt(0, 40, 2, # (0, 100, 1) Para vista aérea
+              -0, 0, 0,
+              0, 1, 0)
+
+    # gluLookAt(0.0-radius*cos_angle, 10, 2-radius*sin_angle,
+    #           0,0,0,
+    #           0,1,0)
+    # sin_angle = math.sin(math.radians(fish_angle))
+    # cos_angle = math.cos(math.radians(fish_angle))
+    # radius = 4
+
 
     # Callback para dibujar las manos
     hands = tracker.get_latest()
@@ -388,7 +453,7 @@ def display():
     gluDisk(quadric, 0, 1.55, 16, 8)
     glPopMatrix()
 
-    draw_damnn()
+    draw_damnnnnnnnn()
 
     # BUILDING ################
 
@@ -435,7 +500,19 @@ def display():
     glPopMatrix()
 
     # FLORES
+    glPushMatrix()
     draw_flowers()
+    glPopMatrix()
+
+    # CRAFTING TABLE
+
+    scale =0.25
+
+    glPushMatrix()
+    glTranslatef(0, 1*scale, 0)
+    glScalef(scale, scale, scale)
+    normal_crafting.draw()
+    glPopMatrix()
 
     # MINION #####################
 
@@ -449,40 +526,43 @@ def display():
 
     sin_angle = math.sin(math.radians(fish_angle))
     cos_angle = math.cos(math.radians(fish_angle))
-    radius = 0.01
+    swim = math.sin(math.radians(2*fish_angle))
+    radius = 0.25
 
     # print(f"{sin_angle} and {cos_angle} ")
 
+    # glPushMatrix()
+    # glScalef(2,2,2)
+    # glRotatef(-90,0,1,0)
+    # normal_fish.draw()
+    # glPopMatrix()
+
     glPushMatrix()
-    glTranslatef(0+radius*cos_angle, 0, -6+radius*sin_angle)
-    glRotatef(-fish_angle, 0, 1, 0)
+    glTranslatef(0+radius*cos_angle, -0.1+(1/8*swim), -6+radius*sin_angle)
+    glRotatef(-(fish_angle-270), 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(0.5+radius*cos_angle, 0, -6+radius*sin_angle)
-    glRotatef(fish_angle, 0, 1, 0)
+    glTranslatef(0.4-radius*cos_angle, 0, -6-radius*sin_angle)
+    glRotatef(-(fish_angle-90), 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
     glPushMatrix()
-    glTranslatef(-6+radius*cos_angle, 0, 6+radius*sin_angle)
-    glRotatef(-fish_angle, 0, 1, 0)
+    glTranslatef(-6, -0.1+(1/8*sin_angle), 6)
+    # glRotatef(-fish_angle, 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
+
 
     glPushMatrix()
-    glTranslatef(-5.9+radius*cos_angle, 0, 5.7+radius*sin_angle)
-    glRotatef(-fish_angle, 0, 1, 0)
+    glTranslatef(-5.9+0.5*cos_angle, -0.1+(1/8*swim), 6.0+0.5*sin_angle)
+    glRotatef(-(fish_angle-270), 0, 1, 0)
     normal_fish.draw()
     glPopMatrix()
 
-    glPushMatrix()
-    glTranslatef(-5.7+radius*cos_angle, 0, 6.1+radius*sin_angle)
-    glRotatef(fish_angle, 0, 1, 0)
-    normal_fish.draw()
-    glPopMatrix()
-
+    draw_fucking_amazing_fish()
     # FERRARI ####################
 
     glPushMatrix()
