@@ -69,6 +69,7 @@ normal_light_pole = LightPole(0.75)
 normal_flower = Flower()
 normal_chingadera = Chingadera()
 normal_crafting = None
+normal_umbrella = Umbrella()
 
 normal_oxxo = Oxxo(1)
 mini_oxxo = Oxxo(0.7)
@@ -435,10 +436,13 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(0, 40, 2, # (0, 100, 1) Para vista aérea
+    # gluLookAt(-6, 2, -0.7, # (0, 100, 1) Para vista aérea
+    #           -3.5, 0, -0.7,
+    #           0, 1, 0)
+
+    gluLookAt(0, 40, 2,  # (0, 100, 1) Para vista aérea
               -0, 0, 0,
               0, 1, 0)
-
 
     # sin_angle = math.sin(math.radians(fish_angle))
     # cos_angle = math.cos(math.radians(fish_angle))
@@ -534,6 +538,25 @@ def display():
 
     # CRAFTING TABLE
     draw_floating_crafting_table()
+
+    # SOMBRILLAS
+
+    glPushMatrix()
+    glTranslatef(-2,0,9.6)
+    normal_umbrella.draw((0.753, 0.086, 0.165))
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-9.8, -0.2, 9.85)
+    glScalef(0.8,0.8, 0.8)
+    normal_umbrella.draw((0.305, 0.792, 0.807))
+    glPopMatrix()
+
+    glPushMatrix()
+    glTranslatef(-3.56, -0.4, -0.65)
+    glScalef(0.8, 0.8, 0.8)
+    normal_umbrella.draw((0.305, 0.807, 0.482))
+    glPopMatrix()
 
     # MINION #####################
 

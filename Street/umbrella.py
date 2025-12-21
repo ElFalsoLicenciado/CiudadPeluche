@@ -46,7 +46,7 @@ def draw_umbrella(umbrella_color=(1,1,1)):
 
 class Umbrella:
     @staticmethod
-    def draw():
+    def draw(color=(1,1,1)):
         glPushMatrix()
-        draw_umbrella()
+        draw_umbrella(color)
         glPopMatrix()
