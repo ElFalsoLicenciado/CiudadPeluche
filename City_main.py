@@ -4,6 +4,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 from PIL import Image
+import pygame
+
 
 from Alive.Minion import Minion
 from Alive.Fish import Fish
@@ -15,8 +17,8 @@ from Street.light_pole import LightPole
 from Street.Tree import Tree
 from Street.Oxxo import Oxxo
 from Street.craftin_table import Crafting
+from Street.umbrella import Umbrella
 from Util.Landmarks import HAND_CONNECTIONS
-import pygame
 
 square_t = 0.0
 square_offset_x = 0.0
@@ -24,6 +26,7 @@ square_offset_z = 0.0
 
 # Modelo para landmarks
 MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
+
 # Variables asbestianas
 minion_t = 0.0
 minion_t_y = 0.0
@@ -38,9 +41,10 @@ ahh_fish_y = 0.0
 ahh_fish_angle = 0.0
 ahh_fish_motion = 1
 
-
 damnn_angle = 0.0
 
+floating_table_offset = 0.0
+floating_table_motion = 1
 
 
 w, h = 800, 600
@@ -362,6 +366,7 @@ def draw_damnnnnnnnn():
     Chingadera.draw()
     glPopMatrix()
 
+
 def draw_fucking_amazing_fish():
     global ahh_fish_t, ahh_fish_x, ahh_fish_y, ahh_fish_motion, ahh_fish_angle
 
@@ -386,6 +391,27 @@ def draw_fucking_amazing_fish():
     glRotatef(-ahh_fish_angle,0,0,1)
     normal_fish.draw()
     glPopMatrix()
+
+
+def draw_floating_crafting_table():
+    global floating_table_offset, floating_table_offset, floating_table_motion
+
+    scale =0.25
+
+    floating_table_offset += 0.05 * floating_table_motion
+
+    if floating_table_offset >= 1.25:
+        floating_table_motion = -1
+    elif floating_table_offset <= 0:
+        floating_table_motion = 1
+
+    glPushMatrix()
+    glTranslatef(3.8, (17*scale) + floating_table_offset, -8.8)
+    glRotatef(damnn_angle, 0 ,1 ,0)
+    glScalef(scale, scale, scale)
+    normal_crafting.draw()
+    glPopMatrix()
+
 
 
 
@@ -413,12 +439,14 @@ def display():
               -0, 0, 0,
               0, 1, 0)
 
-    # gluLookAt(0.0-radius*cos_angle, 10, 2-radius*sin_angle,
-    #           0,0,0,
-    #           0,1,0)
+
     # sin_angle = math.sin(math.radians(fish_angle))
     # cos_angle = math.cos(math.radians(fish_angle))
     # radius = 4
+    #
+    # gluLookAt(0.0-radius*cos_angle, 10, 2-radius*sin_angle,
+    #           0,0,0,
+    #           0,1,0)
 
 
     # Callback para dibujar las manos
@@ -505,14 +533,7 @@ def display():
     glPopMatrix()
 
     # CRAFTING TABLE
-
-    scale =0.25
-
-    glPushMatrix()
-    glTranslatef(0, 1*scale, 0)
-    glScalef(scale, scale, scale)
-    normal_crafting.draw()
-    glPopMatrix()
+    draw_floating_crafting_table()
 
     # MINION #####################
 
