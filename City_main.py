@@ -436,13 +436,13 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    # gluLookAt(-6.4, 2, 8, # (0, 100, 1) Para vista aérea
-    #           -6.4, 0, 6,
-    #           0, 1, 0)
-
-    gluLookAt(0, 40, 2,  # (0, 100, 1) Para vista aérea
-              -0, 0, 0,
+    gluLookAt(-6.4, 4, 10, # (0, 100, 1) Para vista aérea
+              -6.4, 0, 6,
               0, 1, 0)
+
+    # gluLookAt(0, 40, 2,  # (0, 100, 1) Para vista aérea
+    #           -0, 0, 0,
+    #           0, 1, 0)
 
     # sin_angle = math.sin(math.radians(fish_angle))
     # cos_angle = math.cos(math.radians(fish_angle))
@@ -561,9 +561,11 @@ def display():
     # MINION #####################
 
     glPushMatrix()
-    glTranslatef(-2.2 + (2.2*minion_t_x), minion_t_y*2, 5)
+    glTranslatef(-2.2 + (2.2*minion_t_x), minion_t_y*2+.5, 5)
     # glRotatef(45,0,0,0)
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     normal_minion.draw()
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     glPopMatrix()
 
     # FISH #######################

@@ -20,7 +20,7 @@ O = Minion()
 w, h = 800, 600
 
 def init_gl():
-    glClearColor(0, 0, 0, 1)
+    glClearColor(1, 1, 1, 1)
     glEnable(GL_DEPTH_TEST)
 
 def reshape(width, height):
@@ -46,16 +46,17 @@ def display():
 
     glRotate(angle, 0.3, 1, 0)
 
-    #glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
     glTranslatef(-2, -1, 0)
+    glRotatef(0,0,1,0)
     O.draw()
-    #glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    # glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 
     glutSwapBuffers()
 
     glutKeyboardFunc(keyboard)
 
-    angle += 0.0
+    angle += 0.1
 
 def idle():
     glutPostRedisplay()
