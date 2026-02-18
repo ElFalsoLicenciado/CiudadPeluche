@@ -25,7 +25,7 @@ square_offset_x = 0.0
 square_offset_z = 0.0
 
 # Modelo para landmarks
-MODEL_PATH = r"C:\Users\User\Desktop\CiudadPeluche2\LL\hand_landmarker.task"
+MODEL_PATH = r"C:\Users\monte\Downloads\hand_landmarker.task"
 
 # Variables asbestianas
 minion_t = 0.0
@@ -248,23 +248,23 @@ def movement(pts, frame_x):
 
     # Zoom hacia dentro si todos los dedos están juntos
     if dist_prom < 30.0:
-        zoom += 0.005
+        zoom += 0.1
     # Zoom hacia afuera si todos los dedos están separados y lejos de la muñeca
     if dist_prom > 90 and dist_wrist_middle > 70.0 and dist_wrist_pinky > 70.0 and dist_ring_pinky > 70:
-        zoom -= 0.005
+        zoom -= 0.1
     # Habilita movimiento de la escena si el dedo índice y medio están juntos, y el verificador de movimiento es verdadero
     if dist_index_middle < 30.0 and move_verify:
         # Diferencia entre la mitad de la pantalla y la posición del dedo medio para velocidad de rotación
         move_dist = screen_mid - pts[12][0]
-        angle += move_dist * 0.001
+        angle += move_dist * 0.01
         # print("Distancia: ", move_dist)
     # Disminuye la altura de la cámara al
     # solo levantar el meñique
     if only_pinky and dist(pts[20],pts[15]) > 40 and dist_prom < 60:
-        height -= 0.005
+        height -= 0.1
     # Aumenta la altura de la cámara al solo levantar el índice
     if only_index and dist(pts[7],pts[11]) > 30 and 55 < dist_prom < 80:
-        height += 0.005
+        height += 0.1
 
 def dist(p1, p2):
     return math.sqrt(
@@ -436,8 +436,8 @@ def display():
 
     glMatrixMode(GL_MODELVIEW)
     glLoadIdentity()
-    gluLookAt(-6.4, 4, 10, # (0, 100, 1) Para vista aérea
-              -6.4, 0, 6,
+    gluLookAt(-6.4, height, zoom, # (0, 100, 1) Para vista aérea
+              0, 0, 0,
               0, 1, 0)
 
     # gluLookAt(0, 40, 2,  # (0, 100, 1) Para vista aérea
@@ -678,7 +678,7 @@ def display():
 def idle():
     global angle
     glutPostRedisplay()
-    #angle += 0.001
+    angle += 0.001
 
 # Terminar proceso con 'q' o ESC
 def keyboard(key):
